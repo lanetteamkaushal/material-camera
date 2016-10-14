@@ -77,7 +77,8 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
                 .saveDir(saveDir)
                 .showPortraitWarning(true)
                 .allowRetry(true)
-                .defaultToFrontFacing(true);
+                .defaultToFrontFacing(true)
+                .setmPrimaryBackground(R.drawable.black_shape);
 
         if (view.getId() == R.id.launchCameraStillshot)
             materialCamera.stillShot(); // launches the Camera in stillshot mode

@@ -30,23 +30,15 @@ import java.lang.annotation.RetentionPolicy;
 @SuppressWarnings("WeakerAccess")
 public class MaterialCamera {
 
-    @IntDef({QUALITY_HIGH, QUALITY_LOW, QUALITY_480P, QUALITY_720P, QUALITY_1080P})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface QualityProfile {
-    }
-
     public static final int QUALITY_HIGH = CamcorderProfile.QUALITY_HIGH;
     public static final int QUALITY_LOW = CamcorderProfile.QUALITY_LOW;
     public static final int QUALITY_480P = CamcorderProfile.QUALITY_480P;
     public static final int QUALITY_720P = CamcorderProfile.QUALITY_720P;
     public static final int QUALITY_1080P = CamcorderProfile.QUALITY_1080P;
-
     public static final String ERROR_EXTRA = "mcam_error";
     public static final String STATUS_EXTRA = "mcam_status";
-
     public static final int STATUS_RECORDED = 1;
     public static final int STATUS_RETRY = 2;
-
     private Context mContext;
     private Activity mActivityContext;
     private android.app.Fragment mAppFragment;
@@ -66,7 +58,6 @@ public class MaterialCamera {
     private boolean mForceCamera1 = false;
     private boolean mStillShot;
     private long mAutoRecord = -1;
-
     private int mVideoEncodingBitRate = -1;
     private int mAudioEncodingBitRate = -1;
     private int mVideoFrameRate = -1;
@@ -74,7 +65,6 @@ public class MaterialCamera {
     private float mVideoPreferredAspect = -1f;
     private long mMaxFileSize = -1;
     private int mQualityProfile = -1;
-
     private int mIconRecord;
     private int mIconStop;
     private int mIconFrontCamera;
@@ -82,9 +72,9 @@ public class MaterialCamera {
     private int mIconPlay;
     private int mIconPause;
     private int mIconRestart;
-
     private int mLabelRetry;
     private int mLabelConfirm;
+    private int mPrimaryBackground;
 
     public MaterialCamera(@NonNull Activity context) {
         mContext = context;
@@ -304,6 +294,15 @@ public class MaterialCamera {
         return this;
     }
 
+    public int getmPrimaryBackground() {
+        return mPrimaryBackground;
+    }
+
+    public MaterialCamera setmPrimaryBackground(@DrawableRes int mPrimaryBackground) {
+        this.mPrimaryBackground = mPrimaryBackground;
+        return this;
+    }
+
     public Intent getIntent() {
         final Class<?> cls = !mForceCamera1 && CameraUtil.hasCamera2(mContext, mStillShot) ?
                 CaptureActivity2.class : CaptureActivity.class;
@@ -355,6 +354,8 @@ public class MaterialCamera {
             intent.putExtra(CameraIntentKey.LABEL_RETRY, mLabelRetry);
         if (mLabelConfirm != 0)
             intent.putExtra(CameraIntentKey.LABEL_CONFIRM, mLabelConfirm);
+        if (mPrimaryBackground != 0)
+            intent.putExtra(CameraIntentKey.PRIMARY_BACKGROUND, mPrimaryBackground);
 
         return intent;
     }
@@ -366,5 +367,10 @@ public class MaterialCamera {
             mAppFragment.startActivityForResult(getIntent(), requestCode);
         else
             mActivityContext.startActivityForResult(getIntent(), requestCode);
+    }
+
+    @IntDef({QUALITY_HIGH, QUALITY_LOW, QUALITY_480P, QUALITY_720P, QUALITY_1080P})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface QualityProfile {
     }
 }
