@@ -56,9 +56,19 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
     protected ImageButton mButtonFlash;
     protected TextView mRecordDuration;
     protected TextView mDelayStartCountdown;
+
+    private boolean mIsRecording;
     protected String mOutputUri;
     protected BaseCaptureInterface mInterface;
     protected Handler mPositionHandler;
+    protected MediaRecorder mMediaRecorder;
+    private int mIconTextColor;
+
+    protected static void LOG(Object context, String message) {
+        Log.d(context instanceof Class<?> ? ((Class<?>) context).getSimpleName() :
+                context.getClass().getSimpleName(), message);
+    }
+
     private final Runnable mPositionUpdater = new Runnable() {
         @Override
         public void run() {
@@ -188,9 +198,13 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
 
     protected void onFlashModesLoaded() {
         if (getCurrentCameraPosition() != BaseCaptureActivity.CAMERA_POSITION_FRONT) {
-            invalidateFlash();
+            invalidateFlash(false);
         }
     }
+
+    private boolean mDidAutoRecord = false;
+    private Handler mDelayHandler;
+    private int mDelayCurrentSecond = -1;
 
     protected void onCameraOpened() {
         if (mDidAutoRecord || mInterface == null || mInterface.useStillshot() || mInterface.autoRecordDelay() < 0 || getActivity() == null) {
@@ -434,7 +448,7 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
         } else if (id == R.id.stillshot) {
             takeStillshot();
         } else if (id == R.id.flash) {
-            invalidateFlash();
+            invalidateFlash(true);
         } else if (id == R.id.other) {
             if (view.getTag() != null) {
                 int ids = (int) view.getTag();
@@ -453,8 +467,8 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
         }
     }
 
-    private void invalidateFlash() {
-        mInterface.toggleFlashMode();
+    private void invalidateFlash(boolean toggle) {
+        if (toggle) mInterface.toggleFlashMode();
         setupFlashMode();
         onPreferencesUpdated();
     }

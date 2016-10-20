@@ -19,6 +19,7 @@ import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -57,6 +58,26 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     private boolean mDidRecord = false;
     private List<Integer> mFlashModes;
 
+    public static final int PERMISSION_RC = 69;
+
+    @IntDef({CAMERA_POSITION_UNKNOWN, CAMERA_POSITION_BACK, CAMERA_POSITION_FRONT})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface CameraPosition {
+    }
+
+    public static final int CAMERA_POSITION_UNKNOWN = 0;
+    public static final int CAMERA_POSITION_FRONT = 1;
+    public static final int CAMERA_POSITION_BACK = 2;
+
+    @IntDef({FLASH_MODE_OFF, FLASH_MODE_ALWAYS_ON, FLASH_MODE_AUTO})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface FlashMode {
+    }
+
+    public static final int FLASH_MODE_OFF = 0;
+    public static final int FLASH_MODE_ALWAYS_ON = 1;
+    public static final int FLASH_MODE_AUTO = 2;
+
     @Override
     protected final void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -79,7 +100,9 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
 
     @Override
     protected final void onCreate(Bundle savedInstanceState) {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         super.onCreate(savedInstanceState);
+
         if (!CameraUtil.hasCamera(this)) {
             new MaterialDialog.Builder(this)
                     .title(R.string.mcam_error)
@@ -139,7 +162,7 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
         }
         final boolean cameraGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
         final boolean audioGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
-        final boolean audioNeeded = !useStillshot();
+        final boolean audioNeeded = !useStillshot() && !audioDisabled();
 
         String[] perms = null;
         if (cameraGranted) {
@@ -196,11 +219,6 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     }
 
     @Override
-    public long getRecordingStart() {
-        return mRecordingStart;
-    }
-
-    @Override
     public void setRecordingStart(long start) {
         mRecordingStart = start;
         if (start > -1 && hasLengthLimit())
@@ -209,13 +227,18 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     }
 
     @Override
-    public long getRecordingEnd() {
-        return mRecordingEnd;
+    public long getRecordingStart() {
+        return mRecordingStart;
     }
 
     @Override
     public void setRecordingEnd(long end) {
         mRecordingEnd = end;
+    }
+
+    @Override
+    public long getRecordingEnd() {
+        return mRecordingEnd;
     }
 
     @Override
@@ -264,23 +287,23 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     }
 
     @Override
-    public Object getFrontCamera() {
-        return mFrontCameraId;
-    }
-
-    @Override
     public void setFrontCamera(Object id) {
         mFrontCameraId = id;
     }
 
     @Override
-    public Object getBackCamera() {
-        return mBackCameraId;
+    public Object getFrontCamera() {
+        return mFrontCameraId;
     }
 
     @Override
     public void setBackCamera(Object id) {
         mBackCameraId = id;
+    }
+
+    @Override
+    public Object getBackCamera() {
+        return mBackCameraId;
     }
 
     private void showInitialRecorder() {
@@ -315,7 +338,7 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
                 finish();
                 return;
             }
-            useVideo(outputUri);
+            useMedia(outputUri);
         } else {
             if (!hasLengthLimit() || !continueTimerInPlayback()) {
                 // No countdown or countdown should not continue through playback, reset timer to 0
@@ -331,11 +354,15 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
 
     @Override
     public void onShowStillshot(String outputUri) {
-        Fragment frag = StillshotPreviewFragment.newInstance(outputUri, allowRetry(),
-                getIntent().getIntExtra(CameraIntentKey.PRIMARY_COLOR, 0));
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, frag)
-                .commit();
+        if (shouldAutoSubmit()) {
+            useMedia(outputUri);
+        } else {
+            Fragment frag = StillshotPreviewFragment.newInstance(outputUri, allowRetry(),
+                    getIntent().getIntExtra(CameraIntentKey.PRIMARY_COLOR, 0));
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.container, frag)
+                    .commit();
+        }
     }
 
     @Override
@@ -381,7 +408,7 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     }
 
     @Override
-    public final void useVideo(String uri) {
+    public final void useMedia(String uri) {
         if (uri != null) {
             setResult(Activity.RESULT_OK, getIntent()
                     .putExtra(MaterialCamera.STATUS_EXTRA, MaterialCamera.STATUS_RECORDED)
@@ -563,26 +590,7 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     }
 
     @Override
-    public void requestCamera() {
-        setResult(RESULT_CANCELED, new Intent().putExtra(MaterialCamera.STATUS_REQUEST,
-                MaterialCamera.REQUEST_CAMERA));
-        finish();
-    }
-
-    @Override
-    public void requestVideo() {
-        setResult(RESULT_CANCELED, new Intent().putExtra(MaterialCamera.STATUS_REQUEST,
-                MaterialCamera.REQUEST_VIDEO));
-        finish();
-    }
-
-    @IntDef({CAMERA_POSITION_UNKNOWN, CAMERA_POSITION_BACK, CAMERA_POSITION_FRONT})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface CameraPosition {
-    }
-
-    @IntDef({FLASH_MODE_OFF, FLASH_MODE_ALWAYS_ON, FLASH_MODE_AUTO})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface FlashMode {
+    public boolean audioDisabled() {
+        return getIntent().getBooleanExtra(CameraIntentKey.AUDIO_DISABLED, false);
     }
 }
