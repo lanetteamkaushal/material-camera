@@ -17,13 +17,13 @@ public interface BaseCaptureInterface {
 
     void onShowStillshot(String outputUri);
 
-    void setRecordingStart(long start);
-
-    void setRecordingEnd(long end);
-
     long getRecordingStart();
 
+    void setRecordingStart(long start);
+
     long getRecordingEnd();
+
+    void setRecordingEnd(long end);
 
     boolean hasLengthLimit();
 
@@ -40,13 +40,13 @@ public interface BaseCaptureInterface {
     @BaseCaptureActivity.CameraPosition
     int getCurrentCameraPosition();
 
-    void setFrontCamera(Object id);
-
-    void setBackCamera(Object id);
-
     Object getFrontCamera();
 
+    void setFrontCamera(Object id);
+
     Object getBackCamera();
+
+    void setBackCamera(Object id);
 
     void useMedia(String uri);
 
@@ -136,4 +136,8 @@ public interface BaseCaptureInterface {
     long autoRecordDelay();
 
     boolean audioDisabled();
+
+    void requestCamera();
+
+    void requestVideo();
 }

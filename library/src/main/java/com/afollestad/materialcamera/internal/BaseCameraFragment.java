@@ -57,17 +57,9 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
     protected TextView mRecordDuration;
     protected TextView mDelayStartCountdown;
 
-    private boolean mIsRecording;
     protected String mOutputUri;
     protected BaseCaptureInterface mInterface;
     protected Handler mPositionHandler;
-    protected MediaRecorder mMediaRecorder;
-    private int mIconTextColor;
-
-    protected static void LOG(Object context, String message) {
-        Log.d(context instanceof Class<?> ? ((Class<?>) context).getSimpleName() :
-                context.getClass().getSimpleName(), message);
-    }
 
     private final Runnable mPositionUpdater = new Runnable() {
         @Override
@@ -201,10 +193,6 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
             invalidateFlash(false);
         }
     }
-
-    private boolean mDidAutoRecord = false;
-    private Handler mDelayHandler;
-    private int mDelayCurrentSecond = -1;
 
     protected void onCameraOpened() {
         if (mDidAutoRecord || mInterface == null || mInterface.useStillshot() || mInterface.autoRecordDelay() < 0 || getActivity() == null) {

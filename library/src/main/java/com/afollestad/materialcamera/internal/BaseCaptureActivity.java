@@ -58,26 +58,6 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     private boolean mDidRecord = false;
     private List<Integer> mFlashModes;
 
-    public static final int PERMISSION_RC = 69;
-
-    @IntDef({CAMERA_POSITION_UNKNOWN, CAMERA_POSITION_BACK, CAMERA_POSITION_FRONT})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface CameraPosition {
-    }
-
-    public static final int CAMERA_POSITION_UNKNOWN = 0;
-    public static final int CAMERA_POSITION_FRONT = 1;
-    public static final int CAMERA_POSITION_BACK = 2;
-
-    @IntDef({FLASH_MODE_OFF, FLASH_MODE_ALWAYS_ON, FLASH_MODE_AUTO})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface FlashMode {
-    }
-
-    public static final int FLASH_MODE_OFF = 0;
-    public static final int FLASH_MODE_ALWAYS_ON = 1;
-    public static final int FLASH_MODE_AUTO = 2;
-
     @Override
     protected final void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -219,6 +199,11 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     }
 
     @Override
+    public long getRecordingStart() {
+        return mRecordingStart;
+    }
+
+    @Override
     public void setRecordingStart(long start) {
         mRecordingStart = start;
         if (start > -1 && hasLengthLimit())
@@ -227,18 +212,13 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     }
 
     @Override
-    public long getRecordingStart() {
-        return mRecordingStart;
+    public long getRecordingEnd() {
+        return mRecordingEnd;
     }
 
     @Override
     public void setRecordingEnd(long end) {
         mRecordingEnd = end;
-    }
-
-    @Override
-    public long getRecordingEnd() {
-        return mRecordingEnd;
     }
 
     @Override
@@ -287,23 +267,23 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     }
 
     @Override
-    public void setFrontCamera(Object id) {
-        mFrontCameraId = id;
-    }
-
-    @Override
     public Object getFrontCamera() {
         return mFrontCameraId;
     }
 
     @Override
-    public void setBackCamera(Object id) {
-        mBackCameraId = id;
+    public void setFrontCamera(Object id) {
+        mFrontCameraId = id;
     }
 
     @Override
     public Object getBackCamera() {
         return mBackCameraId;
+    }
+
+    @Override
+    public void setBackCamera(Object id) {
+        mBackCameraId = id;
     }
 
     private void showInitialRecorder() {
@@ -592,5 +572,29 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     @Override
     public boolean audioDisabled() {
         return getIntent().getBooleanExtra(CameraIntentKey.AUDIO_DISABLED, false);
+    }
+
+    @Override
+    public void requestCamera() {
+        setResult(RESULT_CANCELED, new Intent().putExtra(MaterialCamera.STATUS_REQUEST,
+                MaterialCamera.REQUEST_CAMERA));
+        finish();
+    }
+
+    @Override
+    public void requestVideo() {
+        setResult(RESULT_CANCELED, new Intent().putExtra(MaterialCamera.STATUS_REQUEST,
+                MaterialCamera.REQUEST_VIDEO));
+        finish();
+    }
+
+    @IntDef({CAMERA_POSITION_UNKNOWN, CAMERA_POSITION_BACK, CAMERA_POSITION_FRONT})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface CameraPosition {
+    }
+
+    @IntDef({FLASH_MODE_OFF, FLASH_MODE_ALWAYS_ON, FLASH_MODE_AUTO})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface FlashMode {
     }
 }
