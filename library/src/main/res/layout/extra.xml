@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_toLeftOf="@+id/vCenter"
+    android:layout_toRightOf="@+id/facing"
+    tools:showIn="@layout/mcam_fragment_videocapture">
+
+    <ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/other"
+        android:layout_width="@dimen/mcam_action_icon_size_smaller"
+        android:layout_height="@dimen/mcam_action_icon_size_smaller"
+        android:layout_centerVertical="true"
+
+        android:background="@drawable/mcam_circle_selector"
+        android:padding="@dimen/mcam_content_inset_less"
+        android:scaleType="fitXY"
+        tools:ignore="ContentDescription"
+        tools:showIn="@layout/mcam_fragment_videocapture"
+        tools:src="@drawable/mcam_camera_front" />
+
+</RelativeLayout>

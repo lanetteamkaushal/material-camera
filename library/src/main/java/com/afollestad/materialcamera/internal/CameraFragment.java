@@ -44,15 +44,15 @@ import static com.afollestad.materialcamera.internal.BaseCaptureActivity.FLASH_M
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class CameraFragment extends BaseCameraFragment implements View.OnClickListener {
 
+    private static final String TAG = "CameraFragment";
     CameraPreview mPreviewView;
     RelativeLayout mPreviewFrame;
-
+    List<Integer> mFlashModes;
     private Camera.Size mVideoSize;
     private Camera mCamera;
     private Point mWindowSize;
     private int mDisplayOrientation;
     private boolean mIsAutoFocusing;
-    List<Integer> mFlashModes;
 
     public static CameraFragment newInstance() {
         CameraFragment fragment = new CameraFragment();
@@ -63,11 +63,13 @@ public class CameraFragment extends BaseCameraFragment implements View.OnClickLi
     private static Camera.Size chooseVideoSize(BaseCaptureInterface ci, List<Camera.Size> choices) {
         Camera.Size backupSize = null;
         for (Camera.Size size : choices) {
-            if (size.height <= ci.videoPreferredHeight()) {
+            if (size.width >= ci.videoPreferredHeight()) {
                 if (size.width == size.height * ci.videoPreferredAspect())
                     return size;
-                if (ci.videoPreferredHeight() >= size.height)
+                if (ci.videoPreferredHeight() >= size.height) {
                     backupSize = size;
+                    break;
+                }
             }
         }
         if (backupSize != null) return backupSize;
@@ -77,14 +79,17 @@ public class CameraFragment extends BaseCameraFragment implements View.OnClickLi
 
     private static Camera.Size chooseOptimalSize(List<Camera.Size> choices, int width, int height, Camera.Size aspectRatio) {
         // Collect the supported resolutions that are at least as big as the preview Surface
+        Log.d(TAG, "chooseOptimalSize() called width = [" + width + "], height = [" + height + "], aspectRatio WIDTH = [" + aspectRatio.width + "] HEIGHT [" + aspectRatio.height + "]");
         List<Camera.Size> bigEnough = new ArrayList<>();
-        int w = aspectRatio.width;
-        int h = aspectRatio.height;
+        float w = aspectRatio.width;
+        float h = aspectRatio.height;
+        Log.d(TAG, "chooseOptimalSize (w/h): " + (w / h));
         for (Camera.Size option : choices) {
-            if (option.height == width * h / w &&
-                    option.width >= width && option.height >= height) {
+            if (option.width == width * (w / h) &&
+                    option.width >= height && option.height >= width) {
                 bigEnough.add(option);
             }
+            Log.d(TAG, "chooseOptimalSize camera Option: " + option.width + "::" + option.height);
         }
 
         // Pick the smallest of those, assuming we found any

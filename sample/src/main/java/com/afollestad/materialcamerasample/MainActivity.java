@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Toast;
 
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private final static int CAMERA_RQ = 6969;
     private final static int PERMISSION_RQ = 84;
+    DisplayMetrics displayMetrics;
+    float ratio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Request permission to save videos in external storage
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_RQ);
         }
+        displayMetrics = getResources().getDisplayMetrics();
+        ratio = (displayMetrics.widthPixels > displayMetrics.heightPixels) ? displayMetrics.heightPixels / displayMetrics.widthPixels : displayMetrics.widthPixels / displayMetrics.heightPixels;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -70,7 +75,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .allowRetry(true)
                 .defaultToFrontFacing(true)
                 .allowRetry(true)
-                .autoSubmit(false)
+                .autoSubmit(true)
+                .videoPreferredAspect(ratio)
+                .videoPreferredHeight((int) (displayMetrics.heightPixels * 0.8))
                 .labelConfirm(R.string.mcam_use_video);
 
         if (view.getId() == R.id.launchCameraStillshot)

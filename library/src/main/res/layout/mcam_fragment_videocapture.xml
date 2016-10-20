@@ -16,14 +16,14 @@
     <RelativeLayout
         android:id="@+id/controlsFrame"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="104dp"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:background="?colorPrimaryDark"
         android:elevation="@dimen/mcam_toolbar_elevation"
         android:paddingBottom="@dimen/mcam_content_inset_less"
-        android:paddingLeft="@dimen/mcam_content_inset"
         android:paddingRight="@dimen/mcam_content_inset"
-        android:paddingTop="@dimen/mcam_content_inset_less"
         tools:background="@color/mcam_color_dark"
         tools:ignore="UnusedAttribute">
 
@@ -33,12 +33,43 @@
             android:layout_height="@dimen/mcam_action_icon_size_smaller"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
+            android:layout_alignParentTop="true"
             android:background="@drawable/mcam_circle_selector"
             android:padding="@dimen/mcam_content_inset_less"
             android:scaleType="fitXY"
             tools:ignore="ContentDescription"
             tools:src="@drawable/mcam_camera_front" />
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/relativeLayout"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/vCenter"
+            tools:showIn="@layout/mcam_fragment_videocapture">
+
+            <ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/other"
+                android:layout_width="@dimen/mcam_action_icon_size_smaller"
+                android:layout_height="@dimen/mcam_action_icon_size_smaller"
+                android:layout_centerInParent="true"
+                android:background="@drawable/mcam_circle_selector"
+                android:padding="@dimen/mcam_content_inset_less"
+                android:scaleType="fitXY"
+                tools:ignore="ContentDescription"
+                tools:showIn="@layout/mcam_fragment_videocapture"
+                tools:src="@drawable/mcam_camera_front" />
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/vCenter"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_centerInParent="true"
+            android:visibility="invisible" />
 
         <ImageButton
             android:id="@+id/flash"
@@ -59,7 +90,6 @@
             android:layout_width="@dimen/mcam_action_icon_size"
             android:layout_height="@dimen/mcam_action_icon_size"
             android:layout_centerInParent="true"
-            android:layout_gravity="center"
             android:background="@drawable/mcam_circle_selector"
             android:padding="@dimen/mcam_content_inset_less"
             android:scaleType="fitXY"
@@ -83,13 +113,37 @@
             android:id="@+id/recordDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
             android:fontFamily="sans-serif-medium"
             android:text="@string/mcam_defaultDuration"
             android:textColor="#fff"
             android:textSize="@dimen/mcam_regular_content_fontsize" />
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/relativeLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/vCenter"
+            tools:showIn="@layout/mcam_fragment_videocapture">
+
+            <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/ivPreview"
+                android:layout_width="@dimen/mcam_action_icon_size_smaller"
+                android:layout_height="@dimen/mcam_action_icon_size_smaller"
+                android:layout_centerInParent="true"
+                android:background="@drawable/mcam_circle_selector"
+                android:padding="@dimen/mcam_content_inset_less"
+                android:scaleType="fitCenter"
+                tools:ignore="ContentDescription"
+                tools:showIn="@layout/mcam_fragment_videocapture"
+                tools:src="@drawable/mcam_camera_front" />
+
+        </RelativeLayout>
 
     </RelativeLayout>
 

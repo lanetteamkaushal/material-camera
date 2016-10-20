@@ -6,12 +6,16 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -44,6 +48,8 @@ import static com.afollestad.materialcamera.internal.BaseCaptureActivity.FLASH_M
  */
 abstract class BaseCameraFragment extends Fragment implements CameraUriInterface, View.OnClickListener {
 
+    protected ImageView mIvPreview;
+    protected ImageButton mOther;
     protected ImageButton mButtonVideo;
     protected ImageButton mButtonStillshot;
     protected ImageButton mButtonFacing;
@@ -110,6 +116,8 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
 
         mDelayStartCountdown = (TextView) view.findViewById(R.id.delayStartCountdown);
         mButtonVideo = (ImageButton) view.findViewById(R.id.video);
+        mOther = (ImageButton) view.findViewById(R.id.other);
+        mIvPreview = (ImageView) view.findViewById(R.id.ivPreview);
         mButtonStillshot = (ImageButton) view.findViewById(R.id.stillshot);
         mButtonFacing = (ImageButton) view.findViewById(R.id.facing);
         if (CameraUtil.isChromium())
@@ -122,6 +130,7 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
         setupFlashMode();
 
         mButtonVideo.setOnClickListener(this);
+        mOther.setOnClickListener(this);
         mButtonStillshot.setOnClickListener(this);
         mButtonFacing.setOnClickListener(this);
         mButtonFlash.setOnClickListener(this);
@@ -160,6 +169,14 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
             mButtonStillshot.setVisibility(View.VISIBLE);
             setImageRes(mButtonStillshot, mInterface.iconStillshot());
             mButtonFlash.setVisibility(View.VISIBLE);
+            setImageRes(mOther, mInterface.iconRecord());
+            mOther.setTag(R.id.video);
+            mIvPreview.setVisibility(View.VISIBLE);
+            setLastImage(mIvPreview);
+        } else {
+            setImageRes(mOther, mInterface.iconStillshot());
+            mOther.setTag(R.id.camera);
+            mIvPreview.setVisibility(View.GONE);
         }
 
         if (mInterface.autoRecordDelay() < 1000) {
@@ -418,6 +435,21 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
             takeStillshot();
         } else if (id == R.id.flash) {
             invalidateFlash();
+        } else if (id == R.id.other) {
+            if (view.getTag() != null) {
+                int ids = (int) view.getTag();
+                if (ids == R.id.camera) {
+                    //Request to open camera
+                    if (mInterface != null) {
+                        mInterface.requestCamera();
+                    }
+                } else if (ids == R.id.video) {
+                    //Request to open video
+                    if (mInterface != null) {
+                        mInterface.requestVideo();
+                    }
+                }
+            }
         }
     }
 
@@ -449,5 +481,28 @@ abstract class BaseCameraFragment extends Fragment implements CameraUriInterface
         }
 
         setImageRes(mButtonFlash, res);
+    }
+
+    private void setLastImage(ImageView imageView) {
+        // Find the last picture
+        String[] projection = new String[]{
+                MediaStore.Images.ImageColumns._ID,
+                MediaStore.Images.ImageColumns.DATA,
+                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.ImageColumns.DATE_TAKEN,
+                MediaStore.Images.ImageColumns.MIME_TYPE
+        };
+        final Cursor cursor = getActivity().getContentResolver()
+                .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
+                        null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+// Put it in the image view
+        if (cursor.moveToFirst()) {
+            String imageLocation = cursor.getString(1);
+            File imageFile = new File(imageLocation);
+            if (imageFile.exists()) {   // TODO: is there a better way to do this?
+                Bitmap bm = BitmapFactory.decodeFile(imageLocation);
+                imageView.setImageBitmap(bm);
+            }
+        }
     }
 }

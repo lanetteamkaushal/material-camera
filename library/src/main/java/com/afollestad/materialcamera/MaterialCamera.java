@@ -35,10 +35,13 @@ public class MaterialCamera {
     public static final int QUALITY_480P = CamcorderProfile.QUALITY_480P;
     public static final int QUALITY_720P = CamcorderProfile.QUALITY_720P;
     public static final int QUALITY_1080P = CamcorderProfile.QUALITY_1080P;
+    public static final String STATUS_REQUEST = "STATUS_REQUEST";
     public static final String ERROR_EXTRA = "mcam_error";
     public static final String STATUS_EXTRA = "mcam_status";
     public static final int STATUS_RECORDED = 1;
     public static final int STATUS_RETRY = 2;
+    public static final int REQUEST_VIDEO = 3;
+    public static final int REQUEST_CAMERA = 4;
     private Context mContext;
     private Activity mActivityContext;
     private android.app.Fragment mAppFragment;
